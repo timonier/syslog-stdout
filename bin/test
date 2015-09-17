@@ -1,0 +1,8 @@
+#!/bin/bash
+set -ex
+cd "`dirname "$0"`/.."
+
+docker rmi mauchede/syslog-stdout || :
+docker build -t mauchede/syslog-stdout example/
+
+docker run --rm mauchede/syslog-stdout
