@@ -2,8 +2,8 @@
 set -e
 cd "`dirname "$0"`/.."
 
-DIST_FOLDER="$(pwd)/dist"
-SRC_FOLDER="$(pwd)/src"
+[[ -z $DIST_FOLDER ]] && DIST_FOLDER="$(pwd)/dist"
+[[ -z $SRC_FOLDER ]] && SRC_FOLDER="$(pwd)/src"
 
 go() {
     docker run \
