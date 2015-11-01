@@ -2,7 +2,9 @@
 set -ex
 cd "`dirname "$0"`/.."
 
+DIST_FOLDER="$(pwd)/tests" bin/build
+
 docker rmi mauchede/syslog-stdout || :
-docker build -t mauchede/syslog-stdout example/
+docker build -t mauchede/syslog-stdout tests/
 
 docker run --rm mauchede/syslog-stdout
