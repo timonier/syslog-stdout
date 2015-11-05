@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM busybox:latest
 
 COPY syslog-stdout /usr/local/bin/syslog-stdout
 RUN chmod +x /usr/local/bin/syslog-stdout
