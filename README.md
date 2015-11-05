@@ -29,4 +29,9 @@ Just run `syslog-stdout` in background.
 
 ## Credits
 
-The original script (in Python) has been created by [Gryphius](https://github.com/gryphius/syslog-stdout).
+The original script (in Python) has been created by [Gryphius](https://github.com/gryphius).
+
+## Links
+
+* [creating statically linked executables in Go](http://blog.xebia.com/2014/07/04/create-the-smallest-possible-docker-container/)
+* [gryphius/syslog-stdout](https://github.com/gryphius/syslog-stdout)

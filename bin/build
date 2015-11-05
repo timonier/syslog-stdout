@@ -5,18 +5,20 @@ cd "`dirname "$0"`/.."
 [[ -z $DIST_FOLDER ]] && DIST_FOLDER="$(pwd)/dist"
 [[ -z $SRC_FOLDER ]] && SRC_FOLDER="$(pwd)/src"
 
-go() {
+cmd() {
     docker run \
         --rm \
+        -e CGO_ENABLED=0 \
         -v /etc/group:/etc/group:ro \
         -v /etc/passwd:/etc/passwd:ro \
         -v /etc/localtime:/etc/localtime:ro \
         -v "$DIST_FOLDER:/go/bin" \
+        -v "$DIST_FOLDER:$DIST_FOLDER" \
         -v "$SRC_FOLDER:/go/src/github.com/mauchede/syslog-stdout" \
-        -u $USER \
         -w "$PWD" \
-        -ti golang:1.3 go "$@"
+        -ti golang:1.3 "$@"
 }
 
-rm $DIST_FOLDER/syslog-stdout 2> /dev/null || :
-go install github.com/mauchede/syslog-stdout
+cmd rm $DIST_FOLDER/syslog-stdout > /dev/null || :
+cmd go install -a -ldflags '-s' github.com/mauchede/syslog-stdout
+cmd chown $(id -u):$(id -g) $DIST_FOLDER/syslog-stdout
