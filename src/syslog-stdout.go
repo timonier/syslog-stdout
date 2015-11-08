@@ -1,11 +1,18 @@
 package main
 
 import (
+    "bufio"
     "fmt"
-    "net"
     "log"
+    "net"
     "os"
     "strconv"
+    "strings"
+)
+
+const (
+    bufferSize = 65536
+    socketPath = "/dev/log"
 )
 
 type Syslog struct {}
@@ -55,27 +62,25 @@ func (syslog Syslog) getSeverity(code int) string {
 }
 
 func (syslog Syslog) listen(connection net.Conn) {
+    reader := bufio.NewReader(connection)
+
     for {
-        buffer := make([]byte, 2048)
-        nr, error := connection.Read(buffer)
+        buffer := make([]byte, bufferSize)
+        size, error := reader.Read(buffer)
         if error != nil {
-            return
+            log.Fatal("Read error:", error)
         }
 
-        header,message := syslog.readData(buffer[0:nr])
-        if "" != header {
-            fmt.Printf("%s: %s\n", header, message)
-        } else {
-            fmt.Println(message)
-        }
+        go syslog.readData(buffer[0:size])
     }
 }
 
-func (syslog Syslog) readData(data []byte) (string, string) {
+func (syslog Syslog) readData(data []byte) {
     header := ""
     message := string(data)
+    size := len(data)
 
-    if ">" == string(data[2]) {
+    if size > 2 && ">" == string(data[2]) {
         code, error := strconv.Atoi(string(data[1]))
 
         header = "unknown:unknown"
@@ -83,8 +88,13 @@ func (syslog Syslog) readData(data []byte) (string, string) {
             header = fmt.Sprintf("%s:%s", syslog.getFacility(code), syslog.getSeverity(code))
         }
 
-        message = string(data[3:])
-    } else if ">" == string(data[3]) {
+        fmt.Printf("%s: %s", header, strings.TrimSuffix(string(data[3:]), "\n"))
+        fmt.Println()
+
+        return
+    }
+
+    if size > 3 && ">" == string(data[3]) {
         code, error := strconv.Atoi(string(data[1:3]))
 
         header = "unknown:unknown"
@@ -92,32 +102,27 @@ func (syslog Syslog) readData(data []byte) (string, string) {
             header = fmt.Sprintf("%s:%s", syslog.getFacility(code), syslog.getSeverity(code))
         }
 
-        message = string(data[4:])
-    }
+        fmt.Printf("%s: %s", header, strings.TrimSuffix(string(data[4:]), "\n"))
+        fmt.Println()
 
-    return header, message
-}
-
-func (syslog Syslog) run() {
-    if _, err := os.Stat("/dev/log"); nil == err {
-        os.Remove("/dev/log")
-    }
-
-    listen, error := net.Listen("unix", "/dev/log")
-    if error != nil {
-        log.Fatal("Listen error: ", error)
         return
     }
 
-    for {
-        connection, error := listen.Accept()
-        if error != nil {
-            log.Fatal("Accept error: ", error)
-            return
-        }
+    log.Println("Invalid message:", message)
+}
 
-        go syslog.listen(connection)
+func (syslog Syslog) run() {
+    if _, err := os.Stat(socketPath); nil == err {
+        os.Remove(socketPath)
     }
+
+    connection, error := net.ListenUnixgram("unixgram", &net.UnixAddr{socketPath, "unixgram"})
+    if nil != error {
+        log.Fatal("Listen error:", error)
+    }
+    defer os.Remove(socketPath)
+
+    syslog.listen(connection)
 }
 
 func main() {
