@@ -1,1 +1,2 @@
-tests/syslog-stdout
+tests/alpine/syslog-stdout
+tests/busybox/syslog-stdout

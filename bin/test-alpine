@@ -1,0 +1,19 @@
+#!/bin/bash
+cd "`dirname "$0"`/.."
+
+fail() {
+    echo "$0: $1" >&2
+    docker rmi mauchede/syslog-stdout > /dev/null 2>&1 || :
+    exit 1
+}
+
+DIST_FOLDER="$(pwd)/tests/alpine" bin/build || fail "syslog-stdout can not be build."
+
+docker rmi mauchede/syslog-stdout > /dev/null 2>&1
+docker build -t mauchede/syslog-stdout tests/alpine > /dev/null || fail "image mauchede/syslog-stdout can not be build."
+
+ACTUAL=$(docker run --rm mauchede/syslog-stdout)
+[[ $ACTUAL != *"root: Test 1 syslog-stdout"* ]] && fail "syslog-stdout does not read the first log."
+[[ $ACTUAL != *"root: Test 2 syslog-stdout"* ]] && fail "syslog-stdout does not read the second log."
+
+exit 0
