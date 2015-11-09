@@ -76,39 +76,29 @@ func (syslog Syslog) listen(connection net.Conn) {
 }
 
 func (syslog Syslog) readData(data []byte) {
-    header := ""
+    header := "unknown:unknown"
     message := string(data)
     size := len(data)
 
     if size > 2 && ">" == string(data[2]) {
         code, error := strconv.Atoi(string(data[1]))
-
-        header = "unknown:unknown"
         if nil == error {
             header = fmt.Sprintf("%s:%s", syslog.getFacility(code), syslog.getSeverity(code))
         }
 
-        fmt.Printf("%s: %s", header, strings.TrimSuffix(string(data[3:]), "\n"))
-        fmt.Println()
-
-        return
+        message = string(data[3:])
     }
 
     if size > 3 && ">" == string(data[3]) {
         code, error := strconv.Atoi(string(data[1:3]))
-
-        header = "unknown:unknown"
         if nil == error {
             header = fmt.Sprintf("%s:%s", syslog.getFacility(code), syslog.getSeverity(code))
         }
 
-        fmt.Printf("%s: %s", header, strings.TrimSuffix(string(data[4:]), "\n"))
-        fmt.Println()
-
-        return
+        message = string(data[4:])
     }
 
-    log.Println("Invalid message:", message)
+    fmt.Printf("%s: %s\n", header, strings.TrimSuffix(message, "\n"))
 }
 
 func (syslog Syslog) run() {

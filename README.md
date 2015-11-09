@@ -11,7 +11,14 @@ Add `dist/syslog-stdout` into an executable folder (like `/usr/local/bin`) insid
 This operation can be done in `Dockerfile` via:
 
 ```
+# Get the latest version
 ADD https://github.com/mauchede/syslog-stdout/raw/master/dist/syslog-stdout /usr/local/bin/syslog-stdout
+RUN chmod +x /usr/local/bin/syslog-stdout
+
+# Or get a specific version
+
+# Get the version 1.0.0
+ADD https://github.com/mauchede/syslog-stdout/raw/v1.0.0/dist/syslog-stdout /usr/local/bin/syslog-stdout
 RUN chmod +x /usr/local/bin/syslog-stdout
 ```
 
