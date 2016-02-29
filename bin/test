@@ -1,6 +1,22 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 cd "`dirname "$0"`/.."
 
-bin/test-alpine
-bin/test-busybox
+fail() {
+    echo "$0: $1" >&2
+    docker rmi timonier/syslog-stdout > /dev/null 2>&1 || :
+    exit 1
+}
+
+test() {
+    OUTPUT=$(docker run -v $PWD/dist:/dist:ro -v $PWD/tests/entrypoint.sh:/entrypoint.sh:ro --rm $1 /entrypoint.sh)
+    $(echo $OUTPUT | grep -v "root: Test 1 syslog-stdout") && fail "syslog-stdout does not read the first log."
+    $(echo $OUTPUT | grep -v "root: Test 2 syslog-stdout") && fail "syslog-stdout does not read the second log."
+
+    echo "[$1] Tests OK"
+}
+
+bin/build
+
+test "alpine:3.3"
+test "busybox:latest"

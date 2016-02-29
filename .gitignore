@@ -1,2 +1,2 @@
-tests/alpine/syslog-stdout
-tests/busybox/syslog-stdout
+dist/*
+!dist/.gitkeep
