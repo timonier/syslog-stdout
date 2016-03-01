@@ -10,8 +10,9 @@ fail() {
 
 test() {
     OUTPUT=$(docker run -v $PWD/dist:/dist:ro -v $PWD/tests/entrypoint.sh:/entrypoint.sh:ro --rm $1 /entrypoint.sh)
-    $(echo $OUTPUT | grep -v "root: Test 1 syslog-stdout") && fail "syslog-stdout does not read the first log."
-    $(echo $OUTPUT | grep -v "root: Test 2 syslog-stdout") && fail "syslog-stdout does not read the second log."
+    echo $OUTPUT | grep -qv "777" && fail "[$1] syslog-stdout permission is incorrect."
+    echo $OUTPUT | grep -qv "root: Test 1 syslog-stdout" && fail "[$1] syslog-stdout does not read the first log."
+    echo $OUTPUT | grep -qv "root: Test 2 syslog-stdout" && fail "[$1] syslog-stdout does not read the second log."
 
     echo "[$1] Tests OK"
 }
