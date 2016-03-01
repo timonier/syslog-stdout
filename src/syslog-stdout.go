@@ -110,7 +110,10 @@ func (syslog Syslog) run() {
     if nil != error {
         log.Fatal("Listen error:", error)
     }
-    defer os.Remove(socketPath)
+
+    if err := os.Chmod(socketPath, 0777); nil != err {
+        log.Fatal("Impossible to change the socket permission.")
+    }
 
     syslog.listen(connection)
 }
