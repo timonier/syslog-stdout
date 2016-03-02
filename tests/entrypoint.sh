@@ -21,6 +21,6 @@ echo $(stat -c '%a' /dev/log)
 
 # Test logs
 
-logger "Test 1 syslog-stdout"
-logger "Test 2 syslog-stdout"
+logger -p "local7.debug" "Test 1 syslog-stdout"
+logger -p "local7.debug" "Test 2 syslog-stdout"
 sleep 1

@@ -1,5 +1,8 @@
 # CHANGELOG
 
+* 1.1.1 (2016-03-02)
+  - Fix analyze of facility and severity.
+
 * 1.1.0 (2016-03-01)
   - Fix socket permission.
   - Fix script "bin/test".
