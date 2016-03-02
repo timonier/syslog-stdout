@@ -78,24 +78,15 @@ func (syslog Syslog) listen(connection net.Conn) {
 func (syslog Syslog) readData(data []byte) {
     header := "unknown:unknown"
     message := string(data)
-    size := len(data)
 
-    if size > 2 && ">" == string(data[2]) {
-        code, error := strconv.Atoi(string(data[1]))
+    endOfCode := strings.Index(message, ">")
+    if -1 != endOfCode && 5 > endOfCode {
+        code, error := strconv.Atoi(string(data[1:endOfCode]))
         if nil == error {
             header = fmt.Sprintf("%s:%s", syslog.getFacility(code), syslog.getSeverity(code))
         }
 
-        message = string(data[3:])
-    }
-
-    if size > 3 && ">" == string(data[3]) {
-        code, error := strconv.Atoi(string(data[1:3]))
-        if nil == error {
-            header = fmt.Sprintf("%s:%s", syslog.getFacility(code), syslog.getSeverity(code))
-        }
-
-        message = string(data[4:])
+        message = string(data[endOfCode + 1:])
     }
 
     fmt.Printf("%s: %s\n", header, strings.TrimSuffix(message, "\n"))
