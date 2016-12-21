@@ -7,12 +7,12 @@ tar fxz /dist/syslog-stdout.tar.gz -C /usr/sbin
 
 # Start syslog-stdout
 
-/usr/sbin/syslog-stdout &
+/usr/sbin/syslog-stdout-linux-amd64 &
 sleep 1
 
-pkill -9 syslog-stdout
+pkill -9 syslog-stdout-linux-amd64
 
-/usr/sbin/syslog-stdout &
+/usr/sbin/syslog-stdout-linux-amd64 &
 sleep 1
 
 # Test chmod

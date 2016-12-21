@@ -7,21 +7,24 @@ SRC_FOLDER=${SRC_FOLDER:-$PWD/src}
 
 cmd() {
     docker run \
-        -e CGO_ENABLED=0 \
         -i \
         -t=$([ -t 0 ] && echo "true" || echo "false") \
-        -v $DIST_FOLDER:/go/bin \
         -v $DIST_FOLDER:$DIST_FOLDER \
-        -v $SRC_FOLDER:/go/src/github.com/timonier/syslog-stdout \
+        -v $SRC_FOLDER:$SRC_FOLDER \
         --entrypoint=/bin/sh \
         --rm \
-        golang:1.3 -c "$@"
+        golang:1.6 -c "$@"
 }
 
 cmd "rm $DIST_FOLDER/syslog-stdout*" > /dev/null || :
 
-cmd "go install -a -ldflags '-s' github.com/timonier/syslog-stdout"
-cmd "cd $DIST_FOLDER && tar czpf syslog-stdout.tar.gz syslog-stdout"
+cmd "CGO_ENABLED=0 GOOS=linux GOARTCH=386 go build -o $DIST_FOLDER/syslog-stdout-linux-386 $SRC_FOLDER/syslog-stdout.go"
+cmd "CGO_ENABLED=0 GOOS=linux GOARTCH=amd64 go build -o $DIST_FOLDER/syslog-stdout-linux-amd64 $SRC_FOLDER/syslog-stdout.go"
+cmd "CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=5 go build -o $DIST_FOLDER/syslog-stdout-linux-armv5 $SRC_FOLDER/syslog-stdout.go"
+cmd "CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=6 go build -o $DIST_FOLDER/syslog-stdout-linux-armv6 $SRC_FOLDER/syslog-stdout.go"
+cmd "CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 go build -o $DIST_FOLDER/syslog-stdout-linux-armv7 $SRC_FOLDER/syslog-stdout.go"
+cmd "CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o $DIST_FOLDER/syslog-stdout-linux-armv8 $SRC_FOLDER/syslog-stdout.go"
 
-cmd "chown $(id -u):$(id -g) $DIST_FOLDER/syslog-stdout"
-cmd "chown $(id -u):$(id -g) $DIST_FOLDER/syslog-stdout.tar.gz"
+cmd "cd $DIST_FOLDER && tar czpf syslog-stdout.tar.gz syslog-stdout-*"
+
+cmd "chown $(id -u):$(id -g) $DIST_FOLDER/syslog-stdout*"

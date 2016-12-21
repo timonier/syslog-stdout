@@ -22,5 +22,5 @@ test() {
 
 bin/build
 
-test "alpine:3.3"
+test "alpine:latest"
 test "busybox:latest"
