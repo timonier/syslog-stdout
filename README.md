@@ -1,5 +1,7 @@
 # README
 
+⚠️ This project is no longer maintained. ⚠️
+
 ## Installation
 
 Add `dist/syslog-stdout` into an executable folder (like `/usr/sbin`) inside your container.
@@ -25,16 +27,6 @@ RUN wget -q O - --no-check-certificate "https://github.com/timonier/syslog-stdou
 ## Usage
 
 Run `syslog-stdout` in background.
-
-## Contributing
-
-1. Fork it.
-2. Create your branch: `git checkout -b my-new-feature`.
-3. Commit your changes: `git commit -am 'Add some feature'`.
-4. Push to the branch: `git push origin my-new-feature`.
-5. Submit a pull request.
-
-__Note__: Use the script `bin/build` to test your modifications locally.
 
 ## Credits
 
